@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: ajay_postgres1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin834
+      POSTGRES_DB: new_employee_db
+    ports:
+      - "5461:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./Backend
+    container_name: ajay_backend1
+    ports:
+      - "3063:3063"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: admin834
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: new_employee_db
+      PORT: 3063
+      HOST: 0.0.0.0
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./Frontend
+    container_name: ajay_frontend1
+    ports:
+      - "8075:80"
+    depends_on:
+      - backend
+
+  hr_page:
+    build: ./HR_Page
+    container_name: ajay_hr_page1
+    ports:
+      - "8076:80"
+    depends_on:
+      - backend
+
+volumes:
+  pg_data:
+
